@@ -1,32 +1,12 @@
-using Test
-using MyFirstPackage
-using Graphs
+using MyFirstPackage, Test
 
-function compute_expected_shortest_path_matrix(g::SimpleGraph)
-    n = nv(g)
-    expected = zeros(Float64, n, n)
-
-    for i in 1:n
-        sp = dijkstra_shortest_paths(g, i)
-        for j in 1:n
-            expected[i, j] = sp.dists[j]
-        end
-    end
-
-    return expected
-end
-
-@testset "Tropical shortest path matrix" begin
-    g = SimpleGraph(5)
-    add_edge!(g, 1, 2)
-    add_edge!(g, 2, 3)
-    add_edge!(g, 3, 4)
-    add_edge!(g, 4, 5)
-
-    M = shortest_path_matrix(g)
-    expected = compute_expected_shortest_path_matrix(g)
-
-    for i in 1:5, j in 1:5
-        @test M[i, j].val ≈ expected[i, j]
-    end
+@testset "shortest_path_matrix" begin
+    adj = [0.0 1.0 Inf;
+           Inf 0.0 2.0;
+           4.0 Inf 0.0]
+    expected = [0.0 1.0 3.0;
+                6.0 0.0 2.0;
+                4.0 5.0 0.0]
+    result = shortest_path_matrix(adj)
+    @test all(abs.(result .- expected) .< 1e-6)
 end
